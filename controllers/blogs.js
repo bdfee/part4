@@ -12,16 +12,16 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
-  const body = request.body
+  const { title, url, author, likes } = request.body
 
-  if (!body.title || !body.url) {
+  if (!title || !url) {
     response.status(404).end()
   } else {
     const blog = new Blog({
-      title: body.title,
-      author: body.author,
-      url: body.url,
-      likes: body.likes
+      title: title,
+      author: author,
+      url: url,
+      likes: likes
     })
 
     const savedBlog = await blog.save()
@@ -35,13 +35,13 @@ blogsRouter.delete('/:id', async (request, response) => {
 })
 
 blogsRouter.put('/:id', async (request, response) => {
-  const body = request.body
+  const { title, author, url, likes } = request.body
 
   const blog = {
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes
+    title: title,
+    author: author,
+    url: url,
+    likes: likes
   }
 
   const existingBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {new: true})
