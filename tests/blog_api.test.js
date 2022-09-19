@@ -1,4 +1,3 @@
-// const { get } = require('lodash')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
