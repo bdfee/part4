@@ -1,3 +1,4 @@
+const jwt_decode = require('jwt-decode')
 const logger = require('./logger')
 
 const requestLogger = (request, response, next) => {
@@ -8,8 +9,20 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+const tokenExtractor = (request, response, next) => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    request.token = authorization.substring(7)
+  }
+
+  next()
+}
+
+const userExtractor = (request, response, next) => {
+  const decodedUser = jwt_decode(request.token)
+  request.user = decodedUser
+  console.log('mw', request.user)
+  next()
 }
 
 const errorHandler = (error, request, response, next) => {
@@ -24,8 +37,14 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
 module.exports = {
   requestLogger,
   unknownEndpoint,
-  errorHandler
+  errorHandler,
+  tokenExtractor,
+  userExtractor
 }

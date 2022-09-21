@@ -1,4 +1,6 @@
 const blogsRouter = require('express').Router()
+const jwt = require('jsonwebtoken')
+
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
@@ -19,27 +21,53 @@ blogsRouter.post('/', async (request, response) => {
     response.status(404).end()
   } else {
 
-    const user = await User.findOne()
+    if (!request.token) 
+      response.status(401).json({ error: 'token missing' })
+    
+    try {
+      const decodedToken = jwt.verify(request.token, process.env.SECRET)
+      const user = await User.findById(decodedToken.id)
 
-    const blog = new Blog({
-      title: title,
-      author: author,
-      url: url,
-      likes: likes,
-      user: user._id
-    })
+      const blog = new Blog({
+        title: title,
+        author: author,
+        url: url,
+        likes: likes,
+        user: user._id
+      })
 
-    const savedBlog = await blog.save()
-    user.blogs = user.blogs.concat(savedBlog._id)
-    await user.save()
+      const savedBlog = await blog.save()
+      user.blogs = user.blogs.concat(savedBlog._id)
+      await user.save()
 
-    response.status(201).json(savedBlog)
+      response.status(201).json(savedBlog)
+    }
+    catch(e) {
+      return response.status(401).json({ error: 'token incorrect' })
+    }
   }  
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndRemove(request.params.id)
-  response.status(204).end()
+  if (!request.token) 
+    response.status(401).json({ error: 'token missing' })
+
+  try {
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    const user = await User.findById(decodedToken.id)
+   
+    const blog = await Blog.findById(request.params.id)
+
+    if (user._id.toString() === blog.user.toString()) {
+      await Blog.findByIdAndRemove(request.params.id)
+      response.status(204).end()
+    } else {
+      return response.status(401).json({ error: 'unauthorized to delete'})
+    }
+  } 
+  catch(e) {
+    return response.status(401).json({ error: 'token incorrect' })
+  }
 })
 
 blogsRouter.put('/:id', async (request, response) => {
