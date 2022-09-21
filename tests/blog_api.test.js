@@ -119,14 +119,14 @@ test('a blog can be updated by id', async () => {
 
   const initialResponse = await api.get(url)
   const initialBlog = initialResponse.body[0]
-  initialBlog.likes = initialBlog.likes++
+  initialBlog.likes = initialBlog.likes + 1
 
   await api
     .put(`${url}/${initialBlog.id}`)
     .send(initialBlog)
 
   const response = await api.get(url)
-  expect(response.body[0].likes).toBe(initialBlogs[0].likes + 1)
+  expect(response.body[0].likes).toBe(initialBlog.likes)
 
 })
 
