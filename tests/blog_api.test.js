@@ -7,45 +7,45 @@ const Blog = require('../models/blog')
 const url = '/api/blogs'
 
 
-const initialBlogs = [
-  {
-    title: 'test one title',
-    author: 'test one author',
-    url: 'www.1.com',
-    likes: 1,
-  },
-  {
-    title: 'test two title',
-    author: 'test two author',
-    url: 'www.2.com',
-    likes: 2,
-  }
-]
+// const initialBlogs = [
+//   {
+//     title: 'test one title',
+//     author: 'test one author',
+//     url: 'www.1.com',
+//     likes: 1,
+//   },
+//   {
+//     title: 'test two title',
+//     author: 'test two author',
+//     url: 'www.2.com',
+//     likes: 2,
+//   }
+// ]
 
 beforeEach( async () => {
   await Blog.deleteMany({})
 
-  const blogObjects = initialBlogs.map(blog => new Blog(blog))
-  const promiseArray = blogObjects.map(blog => blog.save())
-  await Promise.all(promiseArray)
+  // const blogObjects = initialBlogs.map(blog => new Blog(blog))
+  // const promiseArray = blogObjects.map(blog => blog.save())
+  // await Promise.all(promiseArray)
 })
 
-test('server status 200, response is JSON', async () => {
-  await api
-    .get(url)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-})
+// test('server status 200, response is JSON', async () => {
+//   await api
+//     .get(url)
+//     .expect(200)
+//     .expect('Content-Type', /application\/json/)
+// })
 
-test('correct number of blogs is returned', async () => {
-  const response = await api.get(url)
-  expect(response.body).toHaveLength(initialBlogs.length)
-})
+// test('correct number of blogs is returned', async () => {
+//   const response = await api.get(url)
+//   expect(response.body).toHaveLength(initialBlogs.length)
+// })
 
-test('id is defined', async () => {
-  const response = await api.get(url)
-  expect(response.body[0].id).toBeDefined()
-})
+// test('id is defined', async () => {
+//   const response = await api.get(url)
+//   expect(response.body[0].id).toBeDefined()
+// })
 
 test('a new post can be created', async () => {
   const newBlog = {
@@ -65,70 +65,70 @@ test('a new post can be created', async () => {
 
   const title = response.body.map(r => r.title)
 
-  expect(response.body).toHaveLength(initialBlogs.length + 1)
+  expect(response.body).toHaveLength(1)
   expect(title).toContain(newBlog.title)
 })
 
-test('if likes value is omitted from post request, 0 is defaulted and returned', async () => {
-  const newBlogNoLikes = {
-    title: 'add blog with no likes',
-    author: 'create new post',
-    url: 'www.create.com'
-  }
+// test('if likes value is omitted from post request, 0 is defaulted and returned', async () => {
+//   const newBlogNoLikes = {
+//     title: 'add blog with no likes',
+//     author: 'create new post',
+//     url: 'www.create.com'
+//   }
 
-  await api
-    .post(url)
-    .send(newBlogNoLikes)
-    .expect(201)
+//   await api
+//     .post(url)
+//     .send(newBlogNoLikes)
+//     .expect(201)
 
-  const response = await api.get(url)
-  const blog = response.body[response.body.length - 1]
-  expect(blog.likes).toBe(0)
-})
+//   const response = await api.get(url)
+//   const blog = response.body[response.body.length - 1]
+//   expect(blog.likes).toBe(0)
+// })
 
-test('if title or url props are missing, server responds 404 Bad Request', async () => {
+// test('if title or url props are missing, server responds 404 Bad Request', async () => {
 
-  const invalidBlog = {
-    author: 'invalid entry',
-    title: 'still invalid'
-  }
+//   const invalidBlog = {
+//     author: 'invalid entry',
+//     title: 'still invalid'
+//   }
 
-  await api
-    .post(url)
-    .send(invalidBlog)
-    .expect(404)
+//   await api
+//     .post(url)
+//     .send(invalidBlog)
+//     .expect(404)
 
-  const response = await api.get(url)
-  expect(response.body).toHaveLength(initialBlogs.length)
-})
+//   const response = await api.get(url)
+//   expect(response.body).toHaveLength(initialBlogs.length)
+// })
 
-test('a blog can be deleted by id', async () => {
+// test('a blog can be deleted by id', async () => {
 
-  const initialResponse = await api.get(url)
-  const id = initialResponse.body[0].id
+//   const initialResponse = await api.get(url)
+//   const id = initialResponse.body[0].id
 
-  await api
-    .delete(`${url}/${id}`)
-    .expect(204)
+//   await api
+//     .delete(`${url}/${id}`)
+//     .expect(204)
 
-  const response = await api.get(url)
-  expect(response.body.length).toBe(initialBlogs.length - 1)
-})
+//   const response = await api.get(url)
+//   expect(response.body.length).toBe(initialBlogs.length - 1)
+// })
 
-test('a blog can be updated by id', async () => {
+// test('a blog can be updated by id', async () => {
 
-  const initialResponse = await api.get(url)
-  const initialBlog = initialResponse.body[0]
-  initialBlog.likes = initialBlog.likes + 1
+//   const initialResponse = await api.get(url)
+//   const initialBlog = initialResponse.body[0]
+//   initialBlog.likes = initialBlog.likes + 1
 
-  await api
-    .put(`${url}/${initialBlog.id}`)
-    .send(initialBlog)
+//   await api
+//     .put(`${url}/${initialBlog.id}`)
+//     .send(initialBlog)
 
-  const response = await api.get(url)
-  expect(response.body[0].likes).toBe(initialBlog.likes)
+//   const response = await api.get(url)
+//   expect(response.body[0].likes).toBe(initialBlog.likes)
 
-})
+// })
 
 
 afterAll(() => {
