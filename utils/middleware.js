@@ -21,7 +21,7 @@ const tokenExtractor = (request, response, next) => {
 const userExtractor = (request, response, next) => {
   const decodedUser = jwt_decode(request.token)
   request.user = decodedUser
-  console.log('mw', request.user)
+
   next()
 }
 
@@ -32,6 +32,8 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
+  } else if (error.name === 'InvalidTokenError') {
+    return response.status(401).json({ error: 'invalid token'})
   }
 
   next(error)
